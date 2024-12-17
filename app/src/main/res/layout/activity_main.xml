@@ -8,7 +8,5 @@
     app:columnCount="2"
     android:padding="16dp"
     app:orientation="horizontal">
-
-    <!-- Здесь карточки будут динамически добавляться в GridLayout через код -->
-
+    <!-- Карточки будут добавляться программно -->
 </androidx.gridlayout.widget.GridLayout>

@@ -1,71 +1,92 @@
 package com.example.lab3_urls
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
+import android.util.Log
+import androidx.gridlayout.widget.GridLayout
 import android.widget.Toast
+import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.gridlayout.widget.GridLayout
-import com.example.lab3_urls.models.CurrencyRateResponse
+import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import com.example.lab3_urls.models.AverageRate
 import com.example.lab3_urls.models.CurrencyRate
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var gridLayout: GridLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        gridLayout = findViewById(R.id.gridLayout)
+        // Найдите GridLayout по ID
+        val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
 
-        // Запуск асинхронного запроса
-        fetchCurrencyRates()
+        // Загружаем курсы валют
+        fetchCurrencyRates(gridLayout)
     }
 
-    private fun fetchCurrencyRates() {
-        RetrofitInstance.api.getCurrencyRates().enqueue(object : Callback<CurrencyRateResponse> {
-            override fun onResponse(call: Call<CurrencyRateResponse>, response: Response<CurrencyRateResponse>) {
-                if (response.isSuccessful) {
-                    val currencyRates = response.body()?.rates
-                    if (currencyRates != null) {
-                        // Прокачка всех валют с их текущими курсами
-                        runOnUiThread {
-                            currencyRates.forEach { currency ->
-                                addCurrencyCard(currency.currency, currency.currentRate.toString())
-                            }
-                        }
-                    }
+    // Функция для загрузки данных с API
+    private fun fetchCurrencyRates(gridLayout: GridLayout) {
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitInstance.api.getExchangeRates()
+
+                if (response.rates.isNullOrEmpty()) {
+                    Log.e("MainActivity", "Ошибка: Нет данных о курсах валют.")
                 } else {
-                    // Обработка ошибки (например, Toast или Snackbar)
-                    runOnUiThread {
-                        Toast.makeText(applicationContext, "Ошибка при получении данных", Toast.LENGTH_SHORT).show()
-                    }
+                    // Выводим данные в лог
+                    Log.d("MainActivity", "Получены данные о курсах: ${response.rates}")
                 }
-            }
 
-            override fun onFailure(call: Call<CurrencyRateResponse>, t: Throwable) {
-                // В случае ошибки
-                runOnUiThread {
-                    Toast.makeText(applicationContext, "Ошибка при подключении к серверу", Toast.LENGTH_SHORT).show()
+                // Для каждой валюты создаем карточку
+                response.rates?.forEach { currencyRate ->
+                    addCurrencyCard(gridLayout, currencyRate)
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(applicationContext, "Ошибка при загрузке данных", Toast.LENGTH_SHORT).show()
             }
-        })
+        }
     }
 
-    private fun addCurrencyCard(currencyName: String, currencyValue: String) {
-        // Инфлейтинг карточки
-        val cardView = layoutInflater.inflate(R.layout.card_item, gridLayout, false) as CardView
-        val currencyNameTextView: TextView = cardView.findViewById(R.id.currency_name)
-        val currentRateTextView: TextView = cardView.findViewById(R.id.current_rate)
 
-        // Устанавливаем данные для карточки
-        currencyNameTextView.text = currencyName
-        currentRateTextView.text = currencyValue
+
+    // Функция для добавления карточки валюты
+    private fun addCurrencyCard(gridLayout: GridLayout, currencyRate: CurrencyRate) {
+        val inflater = LayoutInflater.from(this)
+        val cardView = inflater.inflate(R.layout.card_item, gridLayout, false) as CardView
+
+        // Настроим карточку
+        val currencyName = cardView.findViewById<TextView>(R.id.currency_name)
+        val currentRate = cardView.findViewById<TextView>(R.id.current_rate)
+
+        // Отображаем информацию о валюте
+        currencyName.text = currencyRate.currency
+        currentRate.text = currencyRate.currentRate.toString()
+
+        // Выводим информацию в лог
+        Log.d("MainActivity", "Добавлена карточка для валюты: ${currencyRate.currency} с курсом: ${currencyRate.currentRate}")
+
+        // Устанавливаем слушатель кликов на карточку
+        cardView.setOnClickListener {
+            // Например, показываем сообщение с названием валюты
+            val message = "Нажали на валюту: ${currencyRate.currency}"
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+            // Передаем валюту в другую активность
+            val intent = Intent(this@MainActivity, HistoryActivity::class.java).apply {
+                putExtra("currency_name", currencyRate.currency)
+                putExtra("history_rates", ArrayList(currencyRate.averageRatesLast5Days)) // Преобразуем в ArrayList
+            }
+            startActivity(intent)
+        }
 
         // Добавляем карточку в GridLayout
         gridLayout.addView(cardView)
+
+        // Выводим информацию о добавленной карточке в лог
+        Log.d("MainActivity", "Карточка добавлена в GridLayout")
     }
 }
