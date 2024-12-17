@@ -7,11 +7,10 @@ import androidx.gridlayout.widget.GridLayout
 import android.widget.Toast
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
-import com.example.lab3_urls.models.AverageRate
 import com.example.lab3_urls.models.CurrencyRate
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +24,9 @@ class MainActivity : AppCompatActivity() {
 
         // Загружаем курсы валют
         fetchCurrencyRates(gridLayout)
+
+        // Запускаем обновление данных каждую минуту
+        startRefreshingData(gridLayout)
     }
 
     // Функция для загрузки данных с API
@@ -40,6 +42,9 @@ class MainActivity : AppCompatActivity() {
                     Log.d("MainActivity", "Получены данные о курсах: ${response.rates}")
                 }
 
+                // Очищаем GridLayout перед добавлением новых данных
+                gridLayout.removeAllViews()
+
                 // Для каждой валюты создаем карточку
                 response.rates?.forEach { currencyRate ->
                     addCurrencyCard(gridLayout, currencyRate)
@@ -50,8 +55,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
     // Функция для добавления карточки валюты
     private fun addCurrencyCard(gridLayout: GridLayout, currencyRate: CurrencyRate) {
@@ -76,5 +79,14 @@ class MainActivity : AppCompatActivity() {
         gridLayout.addView(cardView)
     }
 
-
+    // Функция для обновления данных каждую минуту
+    private fun startRefreshingData(gridLayout: GridLayout) {
+        lifecycleScope.launch {
+            while (true) {
+                fetchCurrencyRates(gridLayout) // Загружаем обновленные данные
+                Log.d("MainActivity startRefreshingData", "Получены данные о курсах")
+                delay(60000) // Задержка в 60 секунд
+            }
+        }
+    }
 }
