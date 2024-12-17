@@ -8,25 +8,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.lab3_urls.R
 import com.example.lab3_urls.models.AverageRate
 
-class HistoryAdapter(private val historyRates: List<AverageRate>) :
-    RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
-
-    class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
-        val rateTextView: TextView = itemView.findViewById(R.id.rateTextView)
-    }
+class HistoryAdapter(private val historyRates: List<AverageRate>) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.history_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.history_item, parent, false)
         return HistoryViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
-        val item = historyRates[position]
-        holder.dateTextView.text = item.date
-        holder.rateTextView.text = item.rate.toString()
+        val rate = historyRates[position]
+        holder.dateTextView.text = rate.date
+        holder.rateTextView.text = rate.rate.toString()
     }
 
-    override fun getItemCount(): Int = historyRates.size
+    override fun getItemCount() = historyRates.size
+
+    inner class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
+        val rateTextView: TextView = itemView.findViewById(R.id.rateTextView)
+    }
 }

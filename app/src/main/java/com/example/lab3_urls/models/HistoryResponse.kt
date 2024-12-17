@@ -5,6 +5,7 @@ import android.widget.Toast
 import com.example.lab3_urls.RetrofitInstance
 import retrofit2.Call
 import retrofit2.Response
+import java.io.Serializable
 
 // Модели данных, которые будут использоваться для истории
 data class CurrencyRateResponse(
@@ -20,5 +21,5 @@ data class CurrencyRate(
 
 data class AverageRate(
     val date: String,
-    val rate: Double
-)
+    val rate: Double // Используем Double для точности
+) : Serializable

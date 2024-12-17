@@ -55,38 +55,26 @@ class MainActivity : AppCompatActivity() {
 
     // Функция для добавления карточки валюты
     private fun addCurrencyCard(gridLayout: GridLayout, currencyRate: CurrencyRate) {
-        val inflater = LayoutInflater.from(this)
-        val cardView = inflater.inflate(R.layout.card_item, gridLayout, false) as CardView
+        val cardView = LayoutInflater.from(this).inflate(R.layout.card_item, gridLayout, false)
 
-        // Настроим карточку
-        val currencyName = cardView.findViewById<TextView>(R.id.currency_name)
-        val currentRate = cardView.findViewById<TextView>(R.id.current_rate)
+        val currencyNameTextView = cardView.findViewById<TextView>(R.id.currency_name)
+        val currentRateTextView = cardView.findViewById<TextView>(R.id.current_rate)
 
-        // Отображаем информацию о валюте
-        currencyName.text = currencyRate.currency
-        currentRate.text = currencyRate.currentRate.toString()
+        currencyNameTextView.text = currencyRate.currency
+        currentRateTextView.text = currencyRate.currentRate.toString()
 
-        // Выводим информацию в лог
-        Log.d("MainActivity", "Добавлена карточка для валюты: ${currencyRate.currency} с курсом: ${currencyRate.currentRate}")
-
-        // Устанавливаем слушатель кликов на карточку
+        // Обработка клика по карточке
         cardView.setOnClickListener {
-            // Например, показываем сообщение с названием валюты
-            val message = "Нажали на валюту: ${currencyRate.currency}"
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-
-            // Передаем валюту в другую активность
-            val intent = Intent(this@MainActivity, HistoryActivity::class.java).apply {
+            // Передаем данные о валюте и ее исторические курсы в HistoryActivity
+            val intent = Intent(this, HistoryActivity::class.java).apply {
                 putExtra("currency_name", currencyRate.currency)
-                putExtra("history_rates", ArrayList(currencyRate.averageRatesLast5Days)) // Преобразуем в ArrayList
+                putExtra("history_rates", ArrayList(currencyRate.averageRatesLast5Days))
             }
             startActivity(intent)
         }
 
-        // Добавляем карточку в GridLayout
         gridLayout.addView(cardView)
-
-        // Выводим информацию о добавленной карточке в лог
-        Log.d("MainActivity", "Карточка добавлена в GridLayout")
     }
+
+
 }
