@@ -66,20 +66,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    // Функция для добавления карточки валюты
     private fun addCurrencyCard(gridLayout: GridLayout, currencyRate: CurrencyRate) {
         val cardView = LayoutInflater.from(this).inflate(R.layout.card_item, gridLayout, false)
 
+        val currencySymbolTextView = cardView.findViewById<TextView>(R.id.currency_symbol)
         val currencyNameTextView = cardView.findViewById<TextView>(R.id.currency_name)
         val currentRateTextView = cardView.findViewById<TextView>(R.id.current_rate)
 
+        // Устанавливаем текст для символа, имени валюты и текущего курса
+        currencySymbolTextView.text = getCurrencySymbol(currencyRate.currency)
         currencyNameTextView.text = currencyRate.currency
         currentRateTextView.text = currencyRate.currentRate.toString()
 
         // Обработка клика по карточке
         cardView.setOnClickListener {
-            // Передаем данные о валюте и ее исторические курсы в HistoryActivity
             val intent = Intent(this, HistoryActivity::class.java).apply {
                 putExtra("currency_name", currencyRate.currency)
                 putExtra("history_rates", ArrayList(currencyRate.averageRatesLast5Days))
