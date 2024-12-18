@@ -1,4 +1,4 @@
-package com.example.lab3_urls
+package com.example.lab3_urls.web
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

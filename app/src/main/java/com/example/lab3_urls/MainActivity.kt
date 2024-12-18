@@ -1,5 +1,6 @@
 package com.example.lab3_urls
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.example.lab3_urls.models.CurrencyRate
+import com.example.lab3_urls.web.RetrofitInstance
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivity", "Ответ от API: $response")
 
                 // Проверяем, что данные не пустые
-                if (response.rates.isNullOrEmpty()) {
+                if (response.rates.isEmpty()) {
                     Log.e("MainActivity", "Пустые данные в ответе: $response")
                     showSnackbar("Ошибка: Нет данных о курсах валют.")
                     return@launch
@@ -66,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun addCurrencyCard(gridLayout: GridLayout, currencyRate: CurrencyRate) {
         val cardView = LayoutInflater.from(this).inflate(R.layout.card_item, gridLayout, false)
 

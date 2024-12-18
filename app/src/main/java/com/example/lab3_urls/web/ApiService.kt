@@ -1,4 +1,4 @@
-package com.example.lab3_urls
+package com.example.lab3_urls.web
 
 import com.example.lab3_urls.models.CurrencyRateResponse
 import retrofit2.http.GET
