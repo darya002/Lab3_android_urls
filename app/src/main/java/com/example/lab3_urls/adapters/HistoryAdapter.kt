@@ -1,5 +1,6 @@
 package com.example.lab3_urls.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ class HistoryAdapter(private val historyList: List<AverageRate>) : RecyclerView.
         return HistoryViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
         val currentHistory = historyList[position]
         holder.dateTextView.text = currentHistory.date
