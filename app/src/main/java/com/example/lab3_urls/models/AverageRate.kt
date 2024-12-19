@@ -4,5 +4,5 @@ import java.io.Serializable
 
 data class AverageRate(
     val date: String,
-    val rate: Double // Используем Double для точности
+    val rate: Double
 ) : Serializable

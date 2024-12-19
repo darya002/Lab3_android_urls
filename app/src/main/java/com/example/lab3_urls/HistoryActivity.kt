@@ -14,15 +14,12 @@ class HistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
 
-        // Получаем данные о выбранной валюте
         val currencyName = intent.getStringExtra("currency_name")
         val historyRates = intent.getSerializableExtra("history_rates") as ArrayList<AverageRate>
 
-        // Настроим RecyclerView для отображения исторических данных
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewHistory)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Устанавливаем адаптер
         val adapter = HistoryAdapter(historyRates)
         recyclerView.adapter = adapter
     }

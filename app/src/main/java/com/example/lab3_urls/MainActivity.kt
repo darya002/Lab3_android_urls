@@ -22,13 +22,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Найдите GridLayout по ID
         val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
 
-        // Загружаем курсы валют
         fetchCurrencyRates(gridLayout)
 
-        // Запускаем обновление данных каждую минуту
         startRefreshingData(gridLayout)
     }
 
@@ -36,20 +33,16 @@ class MainActivity : AppCompatActivity() {
     private fun fetchCurrencyRates(gridLayout: GridLayout) {
         lifecycleScope.launch {
             try {
-                // Выполняем запрос к API
                 val response = RetrofitInstance.api.getExchangeRates()
 
-                // Логируем полный ответ
                 Log.d("MainActivity", "Ответ от API: $response")
 
-                // Проверяем, что данные не пустые
                 if (response.rates.isEmpty()) {
                     Log.e("MainActivity", "Пустые данные в ответе: $response")
                     showSnackbar("Ошибка: Нет данных о курсах валют.")
                     return@launch
                 }
 
-                // Если данные корректны, очищаем GridLayout и добавляем карточки
                 Log.d("MainActivity", "Данные корректны, обновляем GridLayout.")
                 gridLayout.removeAllViews()
 
@@ -58,10 +51,8 @@ class MainActivity : AppCompatActivity() {
                     addCurrencyCard(gridLayout, currencyRate)
                 }
 
-                // Показываем сообщение об успешной загрузке
                 showSnackbar("Данные успешно обновлены!")
             } catch (e: Exception) {
-                // Обработка исключений
                 Log.e("MainActivity", "Ошибка загрузки данных: ${e.message}", e)
                 showSnackbar("Ошибка при загрузке данных: ${e.localizedMessage}")
             }
@@ -76,12 +67,10 @@ class MainActivity : AppCompatActivity() {
         val currencyNameTextView = cardView.findViewById<TextView>(R.id.currency_name)
         val currentRateTextView = cardView.findViewById<TextView>(R.id.current_rate)
 
-        // Устанавливаем текст для символа, имени валюты и текущего курса
         currencySymbolTextView.text = getCurrencySymbol(currencyRate.currency)
         currencyNameTextView.text = currencyRate.currency
         currentRateTextView.text = currencyRate.currentRate.toString()
 
-        // Обработка клика по карточке
         cardView.setOnClickListener {
             val intent = Intent(this, HistoryActivity::class.java).apply {
                 putExtra("currency_name", currencyRate.currency)
@@ -93,18 +82,16 @@ class MainActivity : AppCompatActivity() {
         gridLayout.addView(cardView)
     }
 
-    // Функция для обновления данных каждую минуту
     private fun startRefreshingData(gridLayout: GridLayout) {
         lifecycleScope.launch {
             while (true) {
-                fetchCurrencyRates(gridLayout) // Загружаем обновленные данные
+                fetchCurrencyRates(gridLayout)
                 Log.d("MainActivity startRefreshingData", "Данные обновлены")
-                delay(60000) // Задержка в 60 секунд
+                delay(60000)
             }
         }
     }
 
-    // Вспомогательная функция для показа Snackbar
     private fun showSnackbar(message: String) {
         val rootView = findViewById<View>(android.R.id.content)
         Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show()
