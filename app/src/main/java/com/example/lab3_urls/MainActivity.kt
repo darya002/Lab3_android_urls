@@ -18,19 +18,19 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var gridLayout: GridLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val gridLayout = findViewById<GridLayout>(R.id.gridLayout)
+        gridLayout = findViewById(R.id.gridLayout)
 
-        fetchCurrencyRates(gridLayout)
-
-        startRefreshingData(gridLayout)
+        fetchCurrencyRates()
+        startRefreshingData()
     }
 
-    // Функция для загрузки данных с API
-    private fun fetchCurrencyRates(gridLayout: GridLayout) {
+    private fun fetchCurrencyRates() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitInstance.api.getExchangeRates()
@@ -45,10 +45,9 @@ class MainActivity : AppCompatActivity() {
 
                 Log.d("MainActivity", "Данные корректны, обновляем GridLayout.")
                 gridLayout.removeAllViews()
-
                 response.rates.forEach { currencyRate ->
                     Log.d("MainActivity", "Добавление карточки для валюты: ${currencyRate.currency}")
-                    addCurrencyCard(gridLayout, currencyRate)
+                    addCurrencyCard(currencyRate)
                 }
 
                 showSnackbar("Данные успешно обновлены!")
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun addCurrencyCard(gridLayout: GridLayout, currencyRate: CurrencyRate) {
+    private fun addCurrencyCard(currencyRate: CurrencyRate) {
         val cardView = LayoutInflater.from(this).inflate(R.layout.card_item, gridLayout, false)
 
         val currencySymbolTextView = cardView.findViewById<TextView>(R.id.currency_symbol)
@@ -82,12 +81,12 @@ class MainActivity : AppCompatActivity() {
         gridLayout.addView(cardView)
     }
 
-    private fun startRefreshingData(gridLayout: GridLayout) {
+    private fun startRefreshingData() {
         lifecycleScope.launch {
             while (true) {
-                fetchCurrencyRates(gridLayout)
-                Log.d("MainActivity startRefreshingData", "Данные обновлены")
-                delay(60000)
+                Log.d("MainActivity", "Запуск обновления данных...")
+                fetchCurrencyRates() // Загружаем новые данные
+                delay(60000) // Ожидаем 60 секунд
             }
         }
     }
